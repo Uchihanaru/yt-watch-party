@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="theme-color" content="#09090b">
+    <meta name="description" content="A secure, end-to-end synchronized watch party for couples.">
+    
+    <title>SyncTube | Secure Watch Party</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+</head>
+<body>
+
+    <div id="knockContainer" class="knock-container" aria-live="polite"></div>
+
+    <div id="welcomeModal" class="modal-overlay" role="dialog">
+        <div class="modal-content">
+            <div class="modal-logo"><span class="material-symbols-outlined" style="font-size: 48px; color: var(--accent);">lock</span></div>
+            <h2 id="modalTitle">SyncTube Secure</h2>
+            <p id="modalDesc">Enter your alias to establish an encrypted connection.</p>
+            <input type="text" id="modalUsername" placeholder="Your Alias" maxlength="20" autocomplete="off">
+            <input type="hidden" id="modalRoom">
+            <button id="modalActionBtn">Initialize Session</button>
+            <p id="modalStatus" style="color: var(--accent); margin-top: 12px; display: none; font-size: 0.9rem; font-weight: 500;"></p>
+        </div>
+    </div>
+
+    <header class="yt-navbar">
+        <div class="nav-left">
+            <div class="logo">
+                <span class="material-symbols-outlined logo-icon">smart_display</span>
+                <h1>SyncTube</h1>
+            </div>
+        </div>
+        
+        <div class="nav-center">
+            <div class="search-box">
+                <input type="text" id="videoInput" placeholder="Paste YouTube URL or Direct .mp4 / .m3u8 link...">
+                <button id="loadBtn" class="search-btn"><span class="material-symbols-outlined">search</span></button>
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <button id="inviteBtn" class="invite-btn"><span class="material-symbols-outlined icon-small">link</span><span id="inviteText">Copy Invite</span></button>
+            <div class="room-controls">
+                <span class="material-symbols-outlined icon-small" style="color: #10b981;">shield</span>
+                <span id="navRoomDisplay">Pending...</span>
+                <div class="divider"></div>
+                <span class="material-symbols-outlined icon-small">group</span>
+                <span id="userCountDisplay">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-layout" id="mainLayout">
+        <section class="video-column">
+            <div class="video-wrapper" id="videoWrapper">
+                
+                <div id="idleOverlay" class="idle-overlay">
+                    <div class="idle-content">
+                        <span class="material-symbols-outlined idle-icon">theaters</span>
+                        <h2>Awaiting Signal</h2>
+                        <p>Paste a link above to begin the synchronized broadcast.</p>
+                    </div>
+                </div>
+
+                <div id="autoplayOverlay" class="autoplay-overlay">
+                    <span class="material-symbols-outlined">touch_app</span>
+                    <p>Tap to Sync Stream</p>
+                </div>
+
+                <div id="player"></div>
+                <video id="htmlPlayer" class="hidden" controls playsinline></video>
+                <iframe id="ghostIframe" class="hidden" allowfullscreen allow="autoplay; fullscreen" style="width:100%; height:100%; border:none; outline:none;"></iframe>
+                
+                <div id="reactionContainer" class="reaction-container"></div>
+                <div class="quick-reactions" id="quickReactions">
+                    <button class="reaction-btn" title="Love">💖</button>
+                    <button class="reaction-btn" title="Laugh">😂</button>
+                    <button class="reaction-btn" title="Shock">😮</button>
+                    <button class="reaction-btn" title="Sad">😢</button>
+                    <button class="reaction-btn" title="Fire">🔥</button>
+                </div>
+
+                <div id="fsOverlay" class="fs-overlay">
+                    <span class="material-symbols-outlined icon-small">shield</span>
+                    <span id="fsRoomDisplay" style="margin-left: 4px;">SECURE</span>
+                    <span class="divider-ghost">|</span>
+                    <span class="material-symbols-outlined icon-small">group</span>
+                    <span id="fsUserCountDisplay" style="margin-left: 4px;">0</span>
+                    <span class="divider-ghost">|</span>
+                    <button id="exitFsBtn" class="ghost-btn" title="Exit Fullscreen"><span class="material-symbols-outlined icon-small">fullscreen_exit</span></button>
+                </div>
+            </div>
+            
+            <div class="video-details">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h2 class="video-title">Private Watch Session</h2>
+                        <div class="video-metadata">
+                            <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; color: #10b981;">lock</span>
+                            <span id="roomStatusDisplay">Connecting to secure tunnel...</span>
+                        </div>
+                    </div>
+                    <div class="control-actions">
+                        <select id="qualitySelector" class="quality-btn hidden"><option value="-1">Auto Quality</option></select>
+                        <button id="customFsBtn" class="quality-btn tooltip-anchor"><span class="material-symbols-outlined">fullscreen</span></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="chat-column" id="chatColumn">
+            <header class="chat-header">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent);">encrypted</span>
+                <h3>Encrypted Chat</h3>
+            </header>
+            
+            <div class="chat-messages" id="chatMessages" aria-live="polite">
+                <div class="chat-empty-state">
+                    <span class="material-symbols-outlined" style="font-size: 32px; opacity: 0.5;">forum</span>
+                    <p>End-to-end encrypted. Messages vanish when the room closes.</p>
+                </div>
+            </div>
+
+            <div class="chat-input-wrapper">
+                <div class="chat-user-info">
+                    <span class="material-symbols-outlined" style="font-size: 12px; vertical-align: bottom;">person</span>
+                    <span class="user-name" id="localUsernameDisplay">Authenticating...</span>
+                </div>
+                
+                <emoji-picker id="emojiPicker" class="hidden"></emoji-picker>
+
+                <div class="chat-input-area">
+                    <button id="emojiBtn" class="icon-btn" aria-label="Open Emojis"><span class="material-symbols-outlined">mood</span></button>
+                    <input type="text" id="chatInput" placeholder="Send a secure message..." autocomplete="off">
+                    <div class="chat-actions">
+                        <button id="touchBtn" class="icon-btn accent-pulse" title="Send a Digital Touch"><span class="material-symbols-outlined">favorite</span></button>
+                        <button id="sendBtn" class="icon-btn highlight-btn" aria-label="Send Message"><span class="material-symbols-outlined">send</span></button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

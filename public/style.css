@@ -1,0 +1,532 @@
+/* =========================================
+   1. CINEMATIC THEME VARIABLES
+   ========================================= */
+:root {
+    --bg-base: #09090b;          
+    --bg-surface: #121216;       
+    --bg-surface-light: #1c1c21; 
+    
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    
+    --accent: #ff2a5f;           
+    --accent-hover: #ff4d79;
+    --accent-glow: rgba(255, 42, 95, 0.4);
+    
+    --border-color: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(18, 18, 22, 0.75);
+    --glass-blur: blur(12px);
+    
+    --nav-height: 64px;
+}
+
+/* =========================================
+   2. GLOBAL RESET & TYPOGRAPHY
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; 
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--bg-surface-light);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+}
+
+/* =========================================
+   3. NAVBAR (GLASSMORPHISM)
+   ========================================= */
+.yt-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--nav-height);
+    padding: 0 24px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-left .logo { display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
+.logo h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
+.logo-icon { color: var(--accent); font-size: 28px !important; }
+
+.nav-center .search-box {
+    display: flex; align-items: center; background: var(--bg-surface-light);
+    border: 1px solid var(--border-color); border-radius: 20px;
+    padding: 4px 4px 4px 16px; width: 400px; max-width: 100%; transition: border-color 0.2s;
+}
+.search-box:focus-within { border-color: var(--text-secondary); }
+.search-box input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 0.95rem; outline: none; }
+.search-box input::placeholder { color: var(--text-secondary); }
+
+.search-btn {
+    background: var(--bg-surface); border: none; color: var(--text-secondary); width: 36px; height: 36px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s, color 0.2s;
+}
+.search-btn:hover { background: var(--accent); color: white; }
+
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.invite-btn {
+    background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid var(--border-color);
+    padding: 8px 16px; border-radius: 16px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px;
+}
+.invite-btn:hover { background: rgba(255, 255, 255, 0.1); }
+
+.room-controls {
+    display: flex; align-items: center; gap: 8px; background: var(--bg-surface-light);
+    padding: 6px 12px; border-radius: 16px; font-size: 0.85rem; color: var(--text-secondary); border: 1px solid var(--border-color);
+}
+.icon-small { font-size: 18px !important; }
+
+/* =========================================
+   4. MAIN GRID LAYOUT
+   ========================================= */
+.main-layout {
+    display: flex;
+    height: calc(100dvh - var(--nav-height));
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+    /* Flexbox Safety Locks: Prevents stretching on Fullscreen Exit */
+    min-height: 0;
+    min-width: 0;
+}
+
+/* =========================================
+   5. VIDEO COLUMN (HARDWARE STACKING FIX)
+   ========================================= */
+.video-column { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    background: var(--bg-base); 
+    padding: 24px; 
+    gap: 16px; 
+    overflow-y: auto; 
+    min-height: 0; 
+    min-width: 0; 
+}
+
+.video-wrapper { 
+    width: 100%; 
+    aspect-ratio: 16 / 9; 
+    background: #000; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    position: relative; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+    border: 1px solid var(--border-color); 
+}
+
+/* HARDWARE STACKING FIX: Forces all media players explicitly behind UI overlays */
+#player, #htmlPlayer, #ghostIframe { 
+    position: absolute !important; 
+    top: 0; 
+    left: 0; 
+    width: 100% !important; 
+    height: 100% !important; 
+    border: none; 
+    outline: none; 
+    z-index: 1; 
+    background: #000;
+}
+
+.hidden { display: none !important; }
+
+.video-details { padding: 8px 0; }
+.video-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); }
+.video-metadata { font-size: 0.9rem; color: var(--text-secondary); }
+
+.quality-btn {
+    background: var(--bg-surface-light); color: var(--text-primary); border: 1px solid var(--border-color);
+    padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+}
+
+@keyframes softGlow {
+    0%   { box-shadow: 0 0 0px rgba(255, 42, 95, 0); border-color: transparent; }
+    20%  { box-shadow: 0 0 50px var(--accent-glow); border-color: var(--accent); }
+    100% { box-shadow: 0 0 0px rgba(255, 42, 95, 0); border-color: transparent; }
+}
+.glow-active { animation: softGlow 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+/* =========================================
+   6. CHAT COLUMN (BOTTOM-UP GRAVITY FIX)
+   ========================================= */
+.chat-column {
+    width: 360px; min-width: 360px; background: var(--bg-surface);
+    border-left: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%;
+}
+
+.chat-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 1rem;
+    color: var(--text-primary); background: var(--glass-bg);
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 16px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+}
+
+/* Invisible spring pushing messages from the bottom up */
+.chat-messages::before {
+    content: "";
+    flex: 1 1 auto;
+}
+
+.chat-message {
+    display: flex; align-items: flex-start; gap: 12px;
+    animation: slideIn 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-avatar {
+    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem; color: white; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.chat-content {
+    display: flex; flex-direction: column; gap: 2px; background: var(--bg-surface-light);
+    padding: 8px 12px; border-radius: 4px 16px 16px 16px; max-width: 90%; border: 1px solid var(--border-color);
+}
+
+.chat-author { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
+.chat-text { font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
+
+.chat-input-wrapper { padding: 16px 20px; background: var(--bg-surface); border-top: 1px solid var(--border-color); position: relative; }
+.chat-user-info { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px; }
+.chat-input-area {
+    display: flex; align-items: center; gap: 8px; background: var(--bg-surface-light);
+    border: 1px solid var(--border-color); border-radius: 24px; padding: 4px 6px; transition: border-color 0.2s;
+}
+.chat-input-area:focus-within { border-color: var(--text-secondary); }
+#chatInput { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 0.95rem; padding: 8px; outline: none; }
+
+.icon-btn {
+    background: transparent; border: none; color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 50%; transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+.icon-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+.icon-btn:active { transform: scale(0.9); }
+
+emoji-picker {
+    position: absolute; bottom: 85px; left: 20px; z-index: 100;
+    --background: var(--bg-surface-light); --border-color: var(--border-color); --input-font-color: var(--text-primary);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-radius: 12px;
+}
+
+/* =========================================
+   7. MODALS & NOTIFICATIONS
+   ========================================= */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+.modal-content {
+    background: var(--bg-surface); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px;
+    border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes modalPop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+.modal-content h2 { font-size: 1.75rem; margin-bottom: 8px; }
+.modal-content p { color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem; }
+.modal-content input {
+    width: 100%; padding: 14px 16px; background: var(--bg-surface-light); border: 1px solid var(--border-color);
+    border-radius: 12px; color: white; font-size: 1rem; margin-bottom: 20px; outline: none; transition: border-color 0.2s;
+}
+.modal-content input:focus { border-color: var(--accent); }
+.modal-content button {
+    width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
+    border-radius: 12px; font-size: 1rem; font-weight: 600; transition: filter 0.2s, transform 0.1s;
+}
+.modal-content button:hover { filter: brightness(1.1); }
+.modal-content button:active { transform: scale(0.97); }
+
+.knock-container { position: fixed; top: calc(var(--nav-height) + 16px); right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+.knock-toast {
+    background: var(--bg-surface); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 12px; min-width: 260px;
+    animation: slideInLeft 0.3s ease-out forwards;
+}
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.knock-actions { display: flex; gap: 8px; }
+.knock-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; }
+.btn-accept { background: #10b981; color: white; }
+.btn-deny { background: #ef4444; color: white; }
+
+/* =========================================
+   8. CINEMATIC OVERLAYS & REACTIONS
+   ========================================= */
+
+/* Top-Left Shifted to avoid YT Controls */
+.fs-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px; 
+    background: rgba(0,0,0,0.6);
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.9rem;
+    display: none;
+    align-items: center;
+    backdrop-filter: blur(4px);
+    z-index: 70;
+}
+.is-fullscreen .fs-overlay { display: flex; }
+
+/* Bottom-Left Shifted to avoid YT Controls */
+.reaction-container {
+    position: absolute; bottom: 0; left: 5%; width: 30%; height: 100%;
+    pointer-events: none; overflow: hidden; z-index: 80;
+}
+.floating-emoji {
+    position: absolute; bottom: -40px; font-size: 2.5rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.8));
+    will-change: transform, opacity;
+}
+
+.quick-reactions {
+    position: absolute; 
+    bottom: 70px; 
+    left: 20px; 
+    display: flex; gap: 12px; z-index: 90;
+    background: var(--glass-bg); padding: 10px 20px; border-radius: 30px;
+    backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color);
+    opacity: 0; transform: translateY(10px); transition: all 0.3s ease;
+}
+.video-wrapper:hover .quick-reactions, .quick-reactions:focus-within { opacity: 1; transform: translateY(0); }
+.reaction-btn { background: none; border: none; font-size: 1.8rem; filter: grayscale(40%); transition: transform 0.15s; }
+.reaction-btn:hover { transform: scale(1.4) translateY(-5px); filter: grayscale(0%); }
+
+/* =========================================
+   9. PREMIUM IDLE STATES & EMPTY STATES
+   ========================================= */
+.idle-overlay { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0; 
+    background: radial-gradient(circle at center, #1a1a24 0%, #000000 100%); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 10; 
+    transition: opacity 0.4s ease; 
+}
+
+/* THE FIX: Replaced experimental :has() with a rock-solid JS class */
+.video-wrapper.video-active .idle-overlay { opacity: 0; pointer-events: none; }
+
+.idle-content { text-align: center; color: var(--text-secondary); animation: slowFloat 4s ease-in-out infinite; }
+.idle-icon { font-size: 64px !important; color: rgba(255, 255, 255, 0.1); margin-bottom: 16px; }
+.idle-content h2 { color: var(--text-primary); font-weight: 600; font-size: 1.5rem; margin-bottom: 8px; letter-spacing: 0.5px; }
+
+@keyframes slowFloat { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+
+.chat-empty-state {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    color: var(--text-secondary); font-size: 0.85rem; opacity: 0.6; pointer-events: none;
+}
+.chat-messages:has(.chat-message) .chat-empty-state { display: none; }
+
+.divider { width: 1px; height: 14px; background: var(--border-color); margin: 0 4px; }
+.divider-ghost { margin: 0 6px; opacity: 0.3; }
+.ghost-btn { background: transparent; border: none; color: white; cursor: pointer; display: flex; }
+.chat-actions { display: flex; gap: 4px; align-items: center; }
+.highlight-btn { color: var(--accent); }
+.highlight-btn:hover { background: var(--accent-glow); color: var(--accent); }
+
+.accent-pulse { color: var(--accent); animation: heartbeatPulse 2s infinite; }
+@keyframes heartbeatPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255,42,95,0)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,42,95,0.6)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255,42,95,0)); }
+}
+.accent-pulse:hover { animation: none; transform: scale(1.2); }
+
+/* =========================================
+   10. MOBILE AUTOPLAY OVERLAY (OS DEFENSE)
+   ========================================= */
+.autoplay-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none;
+    align-items: center; justify-content: center; z-index: 85; cursor: pointer; color: white; flex-direction: column;
+}
+.autoplay-blocked .autoplay-overlay { display: flex; }
+.autoplay-overlay span { font-size: 48px; color: var(--accent); margin-bottom: 12px; }
+.autoplay-overlay p { font-size: 1.2rem; font-weight: 600; }
+
+/* =========================================
+   11. TRUE IMMERSIVE FULLSCREEN
+   ========================================= */
+body.is-fullscreen .yt-navbar { display: none !important; }
+body.is-fullscreen .video-details { display: none !important; }
+body.is-fullscreen .main-layout { height: 100dvh; display: block; }
+
+body.is-fullscreen .video-column {
+    padding: 0;
+    width: 100vw;
+    height: 100dvh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    background: #000;
+}
+
+body.is-fullscreen .video-wrapper {
+    height: 100%;
+    border-radius: 0;
+    border: none;
+}
+
+/* =========================================
+   12. MOBILE RESPONSIVENESS & KEYBOARD MODE
+   ========================================= */
+@media (max-width: 1024px) {
+    /* Navbar compacting */
+    .yt-navbar { padding: 0 16px; }
+    .nav-center .search-box { width: 200px; }
+    .nav-right .invite-btn span:last-child { display: none; } 
+    .nav-right .room-controls { display: none; }
+    
+    /* Lock the layout to prevent page scrolling, yielding control to flexbox */
+    body:not(.is-fullscreen) .main-layout { 
+        flex-direction: column; 
+        overflow: hidden !important; 
+    }
+    
+    /* Pin video to top */
+    body:not(.is-fullscreen) .video-column { 
+        padding: 0; 
+        background: #000; 
+        flex: 0 0 auto; 
+        width: 100%; 
+        position: relative !important; 
+        height: auto !important; 
+        z-index: 50;
+    }
+    
+    .video-wrapper { border-radius: 0; border: none; }
+    .video-details { padding: 16px; background: var(--bg-base); }
+    
+    /* Allow chat column to shrink dynamically when keyboard rises */
+    body:not(.is-fullscreen) .chat-column { 
+        width: 100%; 
+        border-left: none; 
+        border-top: 1px solid var(--border-color);
+        flex: 1; 
+        min-height: 0; 
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* THE MAGIC: When typing, hide the bulky UI to make room for Video + Keyboard */
+    body.keyboard-active .yt-navbar { display: none !important; }
+    body.keyboard-active .video-details { display: none !important; }
+    body.keyboard-active .chat-header { display: none !important; }
+    
+    .knock-container { top: 10px; left: 10px; right: 10px; }
+
+    /* --- MOBILE REACTION BAR LOGIC --- */
+    /* Hide in normal mobile view to save space */
+    body:not(.is-fullscreen) .quick-reactions { 
+        display: none; 
+    }
+    
+    /* ONLY reveal in fullscreen IF the device passed the JS OS check (Android/Tab/PC) */
+    body.is-fullscreen.fs-overlay-supported .quick-reactions {
+        display: flex;
+        opacity: 0.85; 
+        transform: translateY(0) scale(0.85); 
+        transform-origin: bottom left;
+        bottom: 40px; 
+        left: 10px;
+        padding: 8px 12px;
+        gap: 8px;
+        z-index: 95;
+    }
+    
+    body.is-fullscreen.fs-overlay-supported .quick-reactions:active { 
+        opacity: 1; 
+    }
+}
+
+/* =========================================
+   13. FULLSCREEN GHOST CHAT (MOBILE)
+   ========================================= */
+.is-fullscreen .chat-column {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    width: 40%; 
+    height: 100%;
+    background: linear-gradient(to left, rgba(0,0,0,0.8) 0%, transparent 100%);
+    border: none; 
+    z-index: 60; 
+    opacity: 0; 
+    transition: opacity 0.3s; 
+    pointer-events: none;
+}
+.is-fullscreen .chat-column.chat-peek { opacity: 1; }
+.is-fullscreen .chat-header, .is-fullscreen .chat-input-wrapper { display: none; }
+.is-fullscreen .chat-messages { padding-bottom: 40px; }
+.is-fullscreen .chat-content { background: transparent; border: none; padding: 0; }
+.is-fullscreen .chat-text { text-shadow: 0 1px 3px rgba(0,0,0,1); }
+
+/* =========================================
+   14. PHANTOM SHIELD (MOBILE ESCAPE HATCH)
+   ========================================= */
+.phantom-shield {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 60; /* Strictly above video (1) and idle state (10) */
+    background: transparent;
+    cursor: pointer;
+    display: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Only activate the invisible shield when the keyboard is open */
+body.keyboard-active .phantom-shield {
+    display: block;
+}
